@@ -1,0 +1,30 @@
+{
+    "hostname": "swim-vm",
+    "root_device": "/dev/vdb",
+    "tty": false,
+    "image_config": {
+        "entrypoint": ["/bin/bash"],
+        "cmd": ["echo Hello from bash"],
+        "env": ["PORT=8080", "DATABASE_URL=postgres://user:pass@host:5432/db"],
+        "working_dir": "/root",
+        "user": "root:root"
+    },
+    "ip_configs": [
+        {
+            "gateway": "192.168.1.1",
+            "ip": "192.168.1.201",
+            "mask": 24
+        }
+    ],
+    "mounts": [],
+    "etc_hosts": [
+        {
+            "host": "swim-vm",
+            "ip": "127.0.0.1",
+            "desc": "swim-vm"
+        }
+    ],
+    "etc_resolv": {
+        "nameservers": ["1.1.1.1", "1.0.0.1"]
+    }
+}

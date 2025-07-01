@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root." >&2
+  exit 1
+fi
+
+GOOS=linux
+GOARCH=amd64
+go build -tags osusergo,netgo -ldflags "-s -w" -o target/init ./init
+
+fallocate -l 64M /tmp/rootfs
+mkfs.ext2 -F /tmp/rootfs
+mkdir -p /tmp/mount
+mount -o loop,noatime /tmp/rootfs /tmp/mount
+mkdir /tmp/mount/swim
+cp init/config.json /tmp/mount/swim
+cp target/init /tmp/mount/swim
+umount /tmp/mount

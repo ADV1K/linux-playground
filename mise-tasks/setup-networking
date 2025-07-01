@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -e
+
+#USAGE arg "<ifname>" help="Ethernet interface name"
+#USAGE arg "<ip>" help="Bridge IP"
+#USAGE arg "<gateway>" help="Gateway IP"
+#USAGE flag "--bridge <bridge>" default="br0" help="Custom name for the bridge"
+
+echo Creating bridge $usage_bridge
+sudo ip link del $usage_bridge type bridge || true
+sudo ip link add $usage_bridge type bridge
+
+echo Attaching $usage_ifname to $usage_bridge
+sudo ip addr flush dev $usage_ifname
+sudo ip link set $usage_ifname down
+sudo ip link set $usage_ifname master $usage_bridge
+
+echo Bringing them up
+sudo ip link set $usage_ifname up
+sudo ip link set $usage_bridge up
+
+echo Assigning IP to bridge
+sudo ip addr add $usage_ip/24 dev $usage_bridge
+
+echo Setting up routing
+sudo ip route add default via $usage_gateway dev $usage_bridge metric 200
+#sudo ip -6 route add default via fe80::1 dev $usage_bridge metric 2048
+
+echo Creating a tap device for testing
+sudo ip link del firetap0 2>/dev/null || true
+sudo ip tuntap add firetap0 mode tap
+sudo ip link set dev firetap0 master $usage_bridge
+sudo ip link set firetap0 up
+
+sleep 2
+ping google.com -c 4 -I $usage_bridge -4
+ip addr show $usage_bridge
