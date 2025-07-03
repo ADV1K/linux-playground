@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package pty;
+
+option go_package = "./pb";
+
+service Pty {
+  rpc Session(stream PtyRequest) returns (stream PtyResponse) {}
+}
+
+message TerminalSize {
+  uint32 rows = 1;
+  uint32 cols = 2;
+}
+
+message Start {
+  TerminalSize size = 3;
+}
+
+message PtyRequest {
+  oneof event {
+    Start start = 1;
+    bytes input = 2;
+    TerminalSize resize = 3;
+  }
+}
+
+message PtyResponse {
+  oneof event {
+    bytes output = 1;
+    uint32 exit_code = 2;
+  }
+}

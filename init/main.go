@@ -16,8 +16,15 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
+// ip=192.168.1.201::192.168.1.1:255.255.255.0::eth0:off
+// {
+//     "gateway": "192.168.1.1",
+//     "ip": "192.168.1.201",
+//     "mask": 24
+// }
+
 const (
-	configFile = "config.json"
+	configFile = "/swim/config.json"
 
 	// Constants for ethtool ioctl
 	SIOCETHTOOL     = 0x8946
@@ -242,9 +249,9 @@ func main() {
 		"cpu,cpuacct",
 		"devices",
 		"blkio",
-		"memory",
 		"perf_event",
-		"cpuset",
+		// "memory",  // Unavailable in current kernel conf: Unknown kernel command line parameters "cgroup_enable=memory", will be passed to user space.
+		// "cpuset",
 	}
 
 	for _, controller := range cgroupV1Controllers {
@@ -457,4 +464,14 @@ func main() {
 			}
 		}
 	}
+
+	startPtyServer()
+
+	// log.Println("System setup complete. Waiting for shutdown signal (e.g., Ctrl+C)...")
+
+	// sigChan := make(chan os.Signal, 1)
+	// signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	// <-sigChan
+	// log.Printf("Bye")
+	// syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
 }
