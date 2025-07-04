@@ -1,6 +1,28 @@
 [tools]
 go = "1.24"
-"aqua:firecracker-microvm/firecracker" = "latest"
+air = "latest"
+protoc = "latest"
+protoc-gen-go = "latest"
+protoc-gen-go-grpc = "latest"
+"aqua:a-h/templ" = "latest"
+"aqua:tailwindlabs/tailwindcss" = "latest"
+# "aqua:firecracker-microvm/firecracker" = "latest"
+
+[tasks.web]
+run = """
+tailwindcss -i web/views/css/styles.css -o web/public/styles.css
+templ generate web/view
+go build -o bin/web ./web
+"""
 
 [tasks.firecracker]
-run = "firecracker --no-api --config-file vmconfig.json"
+run = """
+rm -rf /tmp/v.sock
+firecracker --no-api --config-file vmconfig.json
+"""
+
+[tasks.proto]
+run = "protoc --proto_path=init init/*.proto --go_out=init --go-grpc_out=init"
+
+[tasks.sqlc]
+run = "sqlc generate"

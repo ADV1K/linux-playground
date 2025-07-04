@@ -30,7 +30,7 @@ sudo ip route add default via $usage_gateway dev $usage_bridge metric 200
 echo Creating a tap device for testing
 sudo ip link del firetap0 2>/dev/null || true
 sudo ip tuntap add firetap0 mode tap
-sudo ip link set dev firetap0 master $usage_bridge
+sudo ip link set firetap0 master $usage_bridge
 sudo ip link set firetap0 up
 
 sleep 2
